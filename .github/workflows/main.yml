@@ -1,4 +1,4 @@
-name: fabric mod build and release
+name: bukkit plugin build and release
 on:
   push:
     branches: [ "main" ]
@@ -29,8 +29,6 @@ jobs:
         echo "RELEASE_TITLE=${RELEASE_TITLE}" >> $GITHUB_ENV
     - name: Change gradlew permissions
       run: chmod +x ./gradlew
-    - name: Change permissions
-      run: chmod +x ./start.sh
     - name: Cache Gradle dependencies
       uses: actions/cache@v4
       with:
@@ -41,12 +39,12 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
     - name: Build with Gradle
-      run: ./start.sh ${{ env.TAG_NAME }}
+      run: ./gradlew build -Pversion=${{ env.TAG_NAME }}
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ${{ github.event.repository.name }}-build
-        path: output/*
+        path: build/libs/*
     - name: Create Tag
       run: |
         git config --global user.name "GitHub Actions"
@@ -64,4 +62,4 @@ jobs:
           - 构建时间（北京时间）：${{ env.BUILD_DATE_BJ }}
           - 提交哈希：`${{ github.sha }}`
         draft: false
-        files: output/*
+        files: build/libs/*
